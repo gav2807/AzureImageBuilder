@@ -5,7 +5,7 @@ schedules:
     displayName: Monthly build
     branches:
      include:
-     - main 
+     - main
     always: true
 
 parameters:
@@ -52,100 +52,77 @@ variables:
     - name: serviceConnection
       value: sbs-pr-srd-cmnsvc-product-sp
 
-resources:
-  repositories:
-    - repository: PipelineTemplates
-      type: git
-      name: Skipton/Infrastructure.Platform.Templates
-      ref: refs/tags/v2.0.16
-
 stages:
-  - template: stages/bicep_build.yml@PipelineTemplates
-    parameters:
-      stageName: Build
-      agentPool: $(agentPool)
-      contentsPath: infra/
-      fileToRun: $(fileToRun)
-
-  - stage: Clean
-    displayName: 'Cleanup'
-    dependsOn: Build
+  - stage: Build
+    displayName: 'Build Bicep'
     pool: $(agentPool)
     jobs:
-    - job: Clean
-      steps:
-      - task: AzurePowerShell@5
-        retryCountOnTaskFailure: 10
-        inputs:
-          azureSubscription: $(serviceConnection)
-          scriptType: "InlineScript"
-          azurePowerShellVersion : LatestVersion
-          preferredAzurePowerShellVersion:
-          pwsh: false
-          Inline: |
-            Write-Host '${{ parameters.image }}'
-            Install-Module -Name Az.ImageBuilder -Repository PSGallery -AllowClobber -Force
-
-            Import-Module -Name Az.ImageBuilder
-          
-            $subnet = 'imagebuilder-sn'
-
-            $net = @{
-                Name = 'sbs-uks-${{ variables.environment }}-cmnsvc-lan-vnet'
-                ResourceGroupName = 'sbs-uks-${{ variables.environment }}-cmnsvc-network-rg'
-                }
-
-            $vnet = Get-AzVirtualNetwork @net
-
-            ($vnet | Select -ExpandProperty subnets | Where-Object {$_.Name -eq $subnet}).privateLinkServiceNetworkPolicies = "Disabled"
-
-            $vnet | Set-AzVirtualNetwork
-
-            Remove-AzImageBuilderTemplate -Name '${{ variables.imageTemplateName }}' -ResourceGroupName 'sbs-uks-${{ variables.environment }}-cmnsvc-gallery-rg'
-        env:
-          RETIRE_AZURERM_POWERSHELL_MODULE: false 
-
-  - template: stages/bicep_deploy.yml@PipelineTemplates
-    parameters:
-      agentPool: $(agentPool)
-      stageName: Deploy
-      dependsOn: Clean
-      deploymentMode: incremental
-      deploymentName: Image_$(Get-Date -Format yyyyMMddhhmmss)
-      serviceConnection: $(serviceConnection)
-      subId: $(subscriptionId)
-      deployType: create
-      environmentName: ${{ variables.environment }}
-      location: uksouth
-      fileToRun: $(fileToRun)
-      deployJobName: Deploy
-      paramsFile: 'images/placeholder.json'
-      additionalParams: version=$(version) environment=$(environment) name=${{ parameters.image }}
-
-  - stage: BuildImage
-    dependsOn: Deploy
-    pool: $(agentPool)
-    displayName: 'Build Image'
-    jobs:
-      - job: BuildImage
-        timeoutInMinutes: 120
+      - job: BuildBicep
         steps:
           - task: AzureCLI@2
             inputs:
               azureSubscription: $(serviceConnection)
               scriptType: "ps"
               scriptLocation: "inlineScript"
-              failOnStandardError: true
               inlineScript: |
-                Write-Host ${{ variables.imageTemplateName }}
-                az image builder run --name ${{ variables.imageTemplateName }} --resource-group 'sbs-uks-${{ variables.environment }}-cmnsvc-gallery-rg' --no-wait
+                az bicep build --file $(fileToRun)
 
-                az image builder wait --name ${{ variables.imageTemplateName }} --resource-group 'sbs-uks-${{ variables.environment }}-cmnsvc-gallery-rg'
-                    --custom "lastRunStatus.runState!='Running'"
-                
-                if (($lastRunStatus = az image builder show -n ${{ variables.imageTemplateName }} --resource-group 'sbs-uks-${{ variables.environment }}-cmnsvc-gallery-rg' --query "lastRunStatus.runState") -eq "Failed")
-                {
+  - stage: Clean
+    displayName: 'Cleanup'
+    dependsOn: Build
+    pool: $(agentPool)
+    jobs:
+      - job: Clean
+        steps:
+          - task: AzurePowerShell@5
+            inputs:
+              azureSubscription: $(serviceConnection)
+              scriptType: "InlineScript"
+              azurePowerShellVersion: LatestVersion
+              Inline: |
+                Install-Module -Name Az.ImageBuilder -Repository PSGallery -AllowClobber -Force
+                Import-Module -Name Az.ImageBuilder
+                $subnet = 'imagebuilder-sn'
+                $net = @{
+                    Name = 'sbs-uks-${{ variables.environment }}-cmnsvc-lan-vnet'
+                    ResourceGroupName = 'sbs-uks-${{ variables.environment }}-cmnsvc-network-rg'
+                }
+                $vnet = Get-AzVirtualNetwork @net
+                ($vnet | Select -ExpandProperty subnets | Where-Object {$_.Name -eq $subnet}).privateLinkServiceNetworkPolicies = "Disabled"
+                $vnet | Set-AzVirtualNetwork
+                Remove-AzImageBuilderTemplate -Name '${{ variables.imageTemplateName }}' -ResourceGroupName 'sbs-uks-${{ variables.environment }}-cmnsvc-gallery-rg'
+
+  - stage: Deploy
+    displayName: 'Deploy Bicep'
+    dependsOn: Clean
+    pool: $(agentPool)
+    jobs:
+      - job: DeployBicep
+        steps:
+          - task: AzureCLI@2
+            inputs:
+              azureSubscription: $(serviceConnection)
+              scriptType: "ps"
+              scriptLocation: "inlineScript"
+              inlineScript: |
+                az deployment group create --name Image_$(Build.BuildId) --resource-group 'sbs-uks-${{ variables.environment }}-cmnsvc-gallery-rg' --template-file $(fileToRun) --parameters @images/placeholder.json version=$(version) environment=$(environment) name=${{ parameters.image }}
+
+  - stage: BuildImage
+    displayName: 'Build Image'
+    dependsOn: Deploy
+    pool: $(agentPool)
+    jobs:
+      - job: BuildImage
+        steps:
+          - task: AzureCLI@2
+            inputs:
+              azureSubscription: $(serviceConnection)
+              scriptType: "ps"
+              scriptLocation: "inlineScript"
+              inlineScript: |
+                az image builder run --name ${{ variables.imageTemplateName }} --resource-group 'sbs-uks-${{ variables.environment }}-cmnsvc-gallery-rg' --no-wait
+                az image builder wait --name ${{ variables.imageTemplateName }} --resource-group 'sbs-uks-${{ variables.environment }}-cmnsvc-gallery-rg' --custom "lastRunStatus.runState!='Running'"
+                if (($lastRunStatus = az image builder show -n ${{ variables.imageTemplateName }} --resource-group 'sbs-uks-${{ variables.environment }}-cmnsvc-gallery-rg' --query "lastRunStatus.runState") -eq "Failed") {
                   exit 1
                 }
-
                 az image builder show --name ${{ variables.imageTemplateName }} --resource-group 'sbs-uks-${{ variables.environment }}-cmnsvc-gallery-rg'
