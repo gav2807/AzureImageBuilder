@@ -93,10 +93,6 @@ stages:
               scriptLocation: "inlineScript"
               inlineScript: |
                 try {
-                  # Install and import Image Builder CLI extension if needed
-                  Write-Host "Checking and installing Az Image Builder extension..."
-                  az extension add --name image-builder
-
                   # Set up the resource group and virtual network variables
                   $subnet = "imagebuilder-sn"
                   $resourceGroupName = "sbs-uks-${{ variables.environment }}-cmnsvc-gallery-rg"
@@ -123,6 +119,7 @@ stages:
                   Write-Host "An error occurred: $_"
                   exit 1
                 }
+
 
   - stage: Deploy
     displayName: 'Deploy Bicep'
