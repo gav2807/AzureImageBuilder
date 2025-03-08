@@ -66,9 +66,10 @@ stages:
             displayName: 'List Files in Sources Directory'
           - task: CopyFiles@2
             inputs:
-              SourceFolder: $(Build.SourcesDirectory)/images  # Adjust this path if necessary
+              SourceFolder: $(Build.SourcesDirectory)/infrastructure.platform.AIB/infra/images  # Adjusted path
               Contents: 'win-2019.bicep'
               TargetFolder: $(Build.ArtifactStagingDirectory)
+
           - task: AzureCLI@2
             inputs:
               azureSubscription: $(serviceConnection)
