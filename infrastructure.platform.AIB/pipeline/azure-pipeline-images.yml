@@ -26,7 +26,7 @@ name: $(Year:yyyy).$(Month).$(Rev:r)
 
 variables:
   - name: imageTemplateName
-    value: sbs-uks-$(environment)-${{ parameters.image }}-it
+    value: sbs-uks-np01-win-19-it #sbs-uks-$(environment)-${{ parameters.image }}-it
   - name: fileToRun
     value: infrastructure.platform.AIB/infra/images/${{ parameters.image }}.bicep #images/${{ parameters.image }}.bicep
   - name: version
@@ -93,36 +93,32 @@ stages:
               scriptLocation: "inlineScript"
               inlineScript: |
                 try {
-                    # Set up the resource group and virtual network variables
-                    $subnet = "imagebuilder-sn"
-                    $resourceGroupName = "sbs-uks-$($env:environment)-cmnsvc-network-rg"
-                    $vnetName = "sbs-uks-$($env:environment)-cmnsvc-lan-vnet"
-                    $imageTemplateName = "sbs-uks-$($env:environment)-$($env:image)-it"
+                  # Set up the resource group and virtual network variables
+                  $subnet = "imagebuilder-sn"
+                  $resourceGroupName = "sbs-uks-np01-cmnsvc-network-rg"
+                  $vnetName = "sbs-uks-np01-cmnsvc-lan-vnet"
+                  $imageTemplateName = "sbs-uks-np01-win-19-it"
 
-                    # Install the Image Builder extension if not present
-                    Write-Host "Ensuring the image-builder extension is installed..."
-                    az extension add --name image-builder --upgrade
+                  # Get Virtual Network details
+                  Write-Host "Retrieving virtual network..."
+                  $vnetId = az network vnet show --name $vnetName --resource-group $resourceGroupName --query id -o tsv
 
-                    # Get Virtual Network details
-                    Write-Host "Retrieving virtual network..."
-                    $vnetId = az network vnet show --name $vnetName --resource-group $resourceGroupName --query id -o tsv
+                  if (-not $vnetId) {
+                    Write-Host "Virtual network not found."
+                    exit 1
+                  }
 
-                    if (-not $vnetId) {
-                        Write-Host "Virtual network not found."
-                        exit 1
-                    }
+                  # Update virtual network subnet properties
+                  Write-Host "Disabling private link service network policies on subnet..."
+                  az network vnet subnet update --vnet-name $vnetName --name $subnet --resource-group $resourceGroupName --private-link-service-network-policies Disabled
 
-                    # Update virtual network subnet properties
-                    Write-Host "Disabling private link service network policies on subnet..."
-                    az network vnet subnet update --vnet-name $vnetName --name $subnet --resource-group $resourceGroupName --private-link-service-network-policies Disabled
-
-                    # Remove the Image Builder template
-                    Write-Host "Removing Image Builder template: $imageTemplateName"
-                    az image builder template delete --name $imageTemplateName --resource-group $resourceGroupName --yes
+                  # Remove the Image Builder template
+                  Write-Host "Removing Image Builder template..."
+                  az image builder template delete --name '${{ variables.imageTemplateName }}' --resource-group $resourceGroupName
                 }
                 catch {
-                    Write-Host "An error occurred: $_"
-                    exit 1
+                  Write-Host "An error occurred: $_"
+                  exit 1
                 }
 
 
