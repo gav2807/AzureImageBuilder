@@ -95,8 +95,8 @@ stages:
                 try {
                   # Set up the resource group and virtual network variables
                   $subnet = "imagebuilder-sn"
-                  $resourceGroupName = "sbs-uks-${{ variables.environment }}-cmnsvc-network-rg"
-                  $vnetName = "sbs-uks-${{ variables.environment }}-cmnsvc-lan-vnet"
+                  $resourceGroupName = "sbs-uks-$($env:environment)-cmnsvc-network-rg"
+                  $vnetName = "sbs-uks-$($env:environment)-cmnsvc-lan-vnet"
                   $imageTemplateName = "sbs-uks-$($env:environment)-$($env:image)-it"
 
                   # Get Virtual Network details
