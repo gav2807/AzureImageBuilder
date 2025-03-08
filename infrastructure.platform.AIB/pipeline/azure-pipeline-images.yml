@@ -89,40 +89,41 @@ stages:
           - task: AzureCLI@2
             inputs:
               azureSubscription: $(serviceConnection)
-              scriptType: "ps"
+              scriptType: "ps"  # PowerShell is being used
               scriptLocation: "inlineScript"
               inlineScript: |
                 try {
                   # Install and import Image Builder CLI extension if needed
-                  echo "Checking and installing Az Image Builder extension..."
+                  Write-Host "Checking and installing Az Image Builder extension..."
                   az extension add --name image-builder
 
                   # Set up the resource group and virtual network variables
-                  subnet="imagebuilder-sn"
-                  resourceGroupName="sbs-uks-${{ variables.environment }}-cmnsvc-gallery-rg"
-                  vnetName="sbs-uks-${{ variables.environment }}-cmnsvc-lan-vnet"
+                  $subnet = "imagebuilder-sn"
+                  $resourceGroupName = "sbs-uks-${{ variables.environment }}-cmnsvc-gallery-rg"
+                  $vnetName = "sbs-uks-${{ variables.environment }}-cmnsvc-lan-vnet"
 
                   # Get Virtual Network details
-                  echo "Retrieving virtual network..."
-                  vnetId=$(az network vnet show --name $vnetName --resource-group $resourceGroupName --query id -o tsv)
-                  
-                  if [ -z "$vnetId" ]; then
-                    echo "Virtual network not found."
+                  Write-Host "Retrieving virtual network..."
+                  $vnetId = az network vnet show --name $vnetName --resource-group $resourceGroupName --query id -o tsv
+
+                  if (-not $vnetId) {
+                    Write-Host "Virtual network not found."
                     exit 1
-                  fi
+                  }
 
                   # Update virtual network subnet properties
-                  echo "Disabling private link service network policies on subnet..."
+                  Write-Host "Disabling private link service network policies on subnet..."
                   az network vnet subnet update --vnet-name $vnetName --name $subnet --resource-group $resourceGroupName --private-link-service-network-policies Disabled
 
                   # Remove the Image Builder template
-                  echo "Removing Image Builder template..."
+                  Write-Host "Removing Image Builder template..."
                   az image builder template delete --name '${{ variables.imageTemplateName }}' --resource-group $resourceGroupName
                 }
                 catch {
-                  echo "An error occurred: $_"
+                  Write-Host "An error occurred: $_"
                   exit 1
                 }
+
   - stage: Deploy
     displayName: 'Deploy Bicep'
     dependsOn: Clean
