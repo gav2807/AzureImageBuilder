@@ -36,7 +36,7 @@ variables:
     - name: environment
       value: np01
     - name: agentPool
-      value: sbs-uks-np-srd-services-vmss
+      value: dsha
     - name: subscriptionId
       value: de991dcf-6e08-4849-8e37-d1494a815a94
     - name: serviceConnection
@@ -46,7 +46,7 @@ variables:
     - name: environment
       value: pr01
     - name: agentPool
-      value: sbs-uks-np-srd-services-vmss
+      value: dsha
     - name: subscriptionId
       value: de991dcf-6e08-4849-8e37-d1494a815a94
     - name: serviceConnection
