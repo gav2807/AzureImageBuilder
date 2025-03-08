@@ -60,6 +60,10 @@ stages:
       - job: BuildBicep
         steps:
           - checkout: self 
+          - script: |
+              echo "Listing files in $(Build.SourcesDirectory):"
+              dir $(Build.SourcesDirectory)
+            displayName: 'List Files in Sources Directory'
           - task: CopyFiles@2
             inputs:
               SourceFolder: $(Build.SourcesDirectory)/images  # Adjust this path if necessary
