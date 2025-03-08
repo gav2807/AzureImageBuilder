@@ -134,7 +134,7 @@ stages:
               scriptType: "ps"
               scriptLocation: "inlineScript"
               inlineScript: |
-                az deployment group create --name Image_$(Build.BuildId) --resource-group 'sbs-uks-${{ variables.environment }}-cmnsvc-gallery-rg' --template-file $(fileToRun) --parameters @images/placeholder.json version=$(version) environment=$(environment) name=${{ parameters.image }}
+                az deployment group create --name Image_$(Build.BuildId) --resource-group 'sbs-uks-${{ variables.environment }}-cmnsvc-gallery-rg' --template-file $(fileToRun) --parameters @infrastructure.platform.AIB/infra/images/placeholder.json version=$(version) environment=$(environment) name=${{ parameters.image }}
 
   - stage: BuildImage
     displayName: 'Build Image'
