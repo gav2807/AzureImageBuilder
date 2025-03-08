@@ -13,7 +13,7 @@ var computeGalleryName = 'azuks${environment}cmnsvcimagegal'
 
 var suffix = environment == 'np01' ? 'hardened-beta' : 'hardened'  
 
-resource resouceGroup 'Microsoft.Resources/resourceGroups@2022-09-01' existing = {
+resource resourceGroup 'Microsoft.Resources/resourceGroups@2022-09-01' existing = {
   name: 'az-uks-${environment}-cmnsvc-gallery-rg'
 }
 
@@ -24,22 +24,22 @@ resource imageBuilderRg 'Microsoft.Resources/resourceGroups@2022-09-01' = {
 
 module imageDefinition '../modules/imageDefinition.bicep' = {
   name: '${uniqueString(deployment().name)}-imageDefinition'
-  scope: resouceGroup
+  scope: resourceGroup
   params: {
     computeGalleryName: computeGalleryName
     imageDefinition: {
       name: 'az-uks-win-2019-${suffix}'
       sku: 'az-windows-standard-2019'
-      publisher: 'skipton-building-society'
+      publisher: 'lab'
       offer: 'windows-server-2019'
     }
-    location: resouceGroup.location
+    location: resourceGroup.location
   }
 }
 
 module imageTemplate '../modules/imageTemplate.bicep' = {
   name: '${uniqueString(deployment().name)}-imageTemplate'
-  scope: resouceGroup
+  scope: resourceGroup
   params: {
     osName: name
     computeGalleryName: computeGalleryName
@@ -460,7 +460,7 @@ module imageTemplate '../modules/imageTemplate.bicep' = {
       publisher: 'MicrosoftWindowsServer'
       version: 'latest'
     }
-    location: resouceGroup.location
+    location: resourceGroup.location
     version: version
   }
 }
