@@ -14,7 +14,7 @@ resource image 'Microsoft.Compute/galleries/images@2022-03-03' = {
     architecture: 'x64'
     identifier: {
       offer: imageDefinition.offer
-      publisher: imageDefinition.?publisher ?? 'skipton-building-society'
+      publisher: imageDefinition.?publisher ?? 'lab'
       sku: imageDefinition.sku
     }
     osState: 'Generalized'
