@@ -3,11 +3,11 @@
   'pr01'
 ])
 param environment string
-param location string = 'uksouth'
+// param location string = 'uksouth'
 param name string = 'win-2019'
 param version string
 
-targetScope = 'subscription'
+targetScope = 'resourceGroup'
 
 var computeGalleryName = 'azuks${environment}cmnsvcimagegal'
 
@@ -15,12 +15,13 @@ var suffix = environment == 'np01' ? 'hardened-beta' : 'hardened'
 
 resource resourceGroup 'Microsoft.Resources/resourceGroups@2022-09-01' existing = {
   name: 'sbs-uks-${environment}-cmnsvc-gallery-rg'
+  scope: subscription()
 }
 
-resource imageBuilderRg 'Microsoft.Resources/resourceGroups@2022-09-01' = {
-  name: 'sbs-uks-${environment}-cmnsvc-aib-${name}-rg'
-  location: location
-}
+// resource imageBuilderRg 'Microsoft.Resources/resourceGroups@2022-09-01' = {
+//   name: 'sbs-uks-${environment}-cmnsvc-aib-${name}-rg'
+//   location: location
+// }
 
 module imageDefinition '../modules/imageDefinition.bicep' = {
   name: '${uniqueString(deployment().name)}-imageDefinition'
