@@ -59,12 +59,14 @@ stages:
     jobs:
       - job: BuildBicep
         steps:
+          - checkout: self 
           - task: AzureCLI@2
             inputs:
               azureSubscription: $(serviceConnection)
               scriptType: "ps"
               scriptLocation: "inlineScript"
               inlineScript: |
+                echo "File to run: $(fileToRun)"
                 az bicep build --file $(fileToRun)
 
   - stage: Clean
