@@ -60,6 +60,11 @@ stages:
       - job: BuildBicep
         steps:
           - checkout: self 
+          - task: CopyFiles@2
+            inputs:
+              SourceFolder: $(Build.SourcesDirectory)/images  # Adjust this path if necessary
+              Contents: 'win-2019.bicep'
+              TargetFolder: $(Build.ArtifactStagingDirectory)
           - task: AzureCLI@2
             inputs:
               azureSubscription: $(serviceConnection)
