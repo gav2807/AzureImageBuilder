@@ -59,7 +59,16 @@ stages:
     jobs:
       - job: BuildBicep
         steps:
-          - checkout: self
+          - checkout: self 
+          - script: |
+              echo "Listing files in $(Build.SourcesDirectory):"
+              dir $(Build.SourcesDirectory)
+            displayName: 'List Files in Sources Directory'
+          - task: CopyFiles@2
+            inputs:
+              SourceFolder: $(Build.SourcesDirectory)/images  # Adjust this path if necessary
+              Contents: 'win-2019.bicep'
+              TargetFolder: $(Build.ArtifactStagingDirectory)
           - task: AzureCLI@2
             inputs:
               azureSubscription: $(serviceConnection)
