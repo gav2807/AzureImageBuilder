@@ -61,6 +61,12 @@ stages:
         steps:
           - task: AzureCLI@2
             inputs:
+              azureSubscription: 'bicepaibspn'
+              scriptType: 'ps'
+              scriptLocation: 'inlineScript'
+              inlineScript: '$ProgressPreference = ''SilentlyContinue''; Invoke-WebRequest -Uri https://azcliprod.blob.core.windows.net/msi/azure-cli-2.51.0.msi -OutFile .\AzureCLI.msi; Start-Process msiexec.exe -Wait -ArgumentList ''/I AzureCLI.msi /quiet''; Remove-Item .\AzureCLI.msi'
+          - task: AzureCLI@2
+            inputs:
               azureSubscription: $(serviceConnection)
               scriptType: "ps"
               scriptLocation: "inlineScript"
