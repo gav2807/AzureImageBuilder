@@ -91,17 +91,23 @@ stages:
               scriptType: "InlineScript"
               azurePowerShellVersion: LatestVersion
               Inline: |
-                Install-Module -Name Az.ImageBuilder -Repository PSGallery -AllowClobber -Force
-                Import-Module -Name Az.ImageBuilder
-                $subnet = 'imagebuilder-sn'
-                $net = @{
-                    Name = 'sbs-uks-${{ variables.environment }}-cmnsvc-lan-vnet'
-                    ResourceGroupName = 'sbs-uks-${{ variables.environment }}-cmnsvc-network-rg'
+                try {
+                  Install-Module -Name Az.ImageBuilder -Repository PSGallery -AllowClobber -Force
+                  Import-Module -Name Az.ImageBuilder
+                  $subnet = 'imagebuilder-sn'
+                  $net = @{
+                      Name = 'sbs-uks-${{ variables.environment }}-cmnsvc-lan-vnet'
+                      ResourceGroupName = 'sbs-uks-${{ variables.environment }}-cmnsvc-network-rg'
+                  }
+                  $vnet = Get-AzVirtualNetwork @net
+                  ($vnet | Select -ExpandProperty subnets | Where-Object {$_.Name -eq $subnet}).privateLinkServiceNetworkPolicies = "Disabled"
+                  $vnet | Set-AzVirtualNetwork
+                  Remove-AzImageBuilderTemplate -Name '${{ variables.imageTemplateName }}' -ResourceGroupName 'sbs-uks-${{ variables.environment }}-cmnsvc-gallery-rg'
                 }
-                $vnet = Get-AzVirtualNetwork @net
-                ($vnet | Select -ExpandProperty subnets | Where-Object {$_.Name -eq $subnet}).privateLinkServiceNetworkPolicies = "Disabled"
-                $vnet | Set-AzVirtualNetwork
-                Remove-AzImageBuilderTemplate -Name '${{ variables.imageTemplateName }}' -ResourceGroupName 'sbs-uks-${{ variables.environment }}-cmnsvc-gallery-rg'
+                catch {
+                  Write-Error "An error occurred: $_"
+                  exit 1
+                }
 
   - stage: Deploy
     displayName: 'Deploy Bicep'
