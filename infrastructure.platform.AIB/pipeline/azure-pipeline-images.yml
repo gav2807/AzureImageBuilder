@@ -38,9 +38,9 @@ variables:
     - name: agentPool
       value: sbs-uks-np-srd-services-vmss
     - name: subscriptionId
-      value: 892aac0b-37f6-4b3a-8223-95a1f68bd5b1
+      value: de991dcf-6e08-4849-8e37-d1494a815a94
     - name: serviceConnection
-      value: sbs-np-srd-cmnsvc-product-sp
+      value: bicepaibspn
 
   - ${{ if eq(parameters.mode, 'stable') }}:
     - name: environment
@@ -48,9 +48,9 @@ variables:
     - name: agentPool
       value: sbs-uks-np-srd-services-vmss
     - name: subscriptionId
-      value: 6b87b5c9-7b49-48b2-b68e-f41ae7c6d38d
+      value: de991dcf-6e08-4849-8e37-d1494a815a94
     - name: serviceConnection
-      value: sbs-pr-srd-cmnsvc-product-sp
+      value: bicepaibspn
 
 stages:
   - stage: Build
