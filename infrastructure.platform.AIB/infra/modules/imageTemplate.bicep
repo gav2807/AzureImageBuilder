@@ -11,62 +11,24 @@ param osName string
 param version string
 param resourceGroupName string = 'sbs-uks-${environment}-${osName}-cmnsvc-aib-rg'
 
-resource identity 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' = {
-  name: 'az-uks-${environment}-cmnsvc-aib-id'
-  location: 'uksouth'
+
+resource identity 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' existing = {
+  name: 'sbs-uks-${environment}-cmnsvc-aib-id'
 }
 
-resource acg 'Microsoft.Compute/galleries@2022-03-03' = {
+resource acg 'Microsoft.Compute/galleries@2022-03-03' existing = {
   name: computeGalleryName
-  location: 'uksouth'
-} 
-
-resource vnet 'Microsoft.Network/virtualNetworks@2022-11-01' = {
-  name: 'az-uks-${environment}-cmnsvc-lan-vnet'
-  location: resourceGroup().location
-  properties: {
-    addressSpace: {
-      addressPrefixes: [
-        '10.0.0.0/16'
-      ]
-    }
-    subnets: [
-      {
-        name: 'imagebuilder-sn'
-        properties: {
-          addressPrefix: '10.0.0.0/24'
-        }
-      }
-    ]
-  }
 }
 
-resource subnet 'Microsoft.Network/virtualNetworks/subnets@2022-11-01' = {
-  parent: vnet
+resource vnet 'Microsoft.Network/virtualNetworks@2022-11-01' existing = {
+  name: 'sbs-uks-${environment}-cmnsvc-lan-vnet'
+  scope: resourceGroup('sbs-uks-${environment}-cmnsvc-network-rg')
+}
+
+resource subnet 'Microsoft.Network/virtualNetworks/subnets@2022-11-01' existing = {
   name: 'imagebuilder-sn'
-  properties: {
-    addressPrefix: '10.0.0.0/24'
-  }
+  parent: vnet
 }
-
-
-// resource identity 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' existing = {
-//   name: 'az-uks-${environment}-cmnsvc-aib-id'
-// }
-
-// resource acg 'Microsoft.Compute/galleries@2022-03-03' existing = {
-//   name: computeGalleryName
-// }
-
-// resource vnet 'Microsoft.Network/virtualNetworks@2022-11-01' existing = {
-//   name: 'az-uks-${environment}-cmnsvc-lan-vnet'
-//   scope: resourceGroup('az-uks-${environment}-cmnsvc-network-rg')
-// }
-
-// resource subnet 'Microsoft.Network/virtualNetworks/subnets@2022-11-01' existing = {
-//   name: 'imagebuilder-sn'
-//   parent: vnet
-// }
 
 resource imageTemplate 'Microsoft.VirtualMachineImages/imageTemplates@2022-02-14' = {
   name: imageTemplateName 
