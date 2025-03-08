@@ -65,7 +65,16 @@ stages:
               Start-Process msiexec.exe -ArgumentList '/I AzureCLI.msi /quiet' -Wait
               echo "Azure CLI installed successfully"
               az --version
-            displayName: 'Install Azure CLI on Windows'
+
+              echo "Restarting Azure CLI service if applicable..."
+              # Restart the service if Azure CLI runs as a service
+              if (Get-Service -Name "AzureCLIService" -ErrorAction SilentlyContinue) {
+                  Restart-Service -Name "AzureCLIService" -Force
+                  echo "Azure CLI service restarted successfully"
+              } else {
+                  echo "Azure CLI service not found. No restart needed."
+              }
+            displayName: 'Install and Restart Azure CLI on Windows'
 
   - stage: Build
     displayName: 'Build Bicep'
