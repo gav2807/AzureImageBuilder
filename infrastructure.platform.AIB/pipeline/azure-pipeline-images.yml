@@ -28,7 +28,7 @@ variables:
   - name: imageTemplateName
     value: sbs-uks-$(environment)-${{ parameters.image }}-it
   - name: fileToRun
-    value: images/${{ parameters.image }}.bicep
+    value: infrastructure.platform.AIB/infra/images/${{ parameters.image }}.bicep #images/${{ parameters.image }}.bicep
   - name: version
     value: '$(Build.BuildNumber)'
 
