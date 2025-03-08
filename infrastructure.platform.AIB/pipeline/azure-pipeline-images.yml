@@ -17,7 +17,7 @@ parameters:
     - stable
 - name: image
   type: string
-  default: windows2019
+  default: win-2019
   values:
     - win-2019
     - ubuntu-pro-2204
