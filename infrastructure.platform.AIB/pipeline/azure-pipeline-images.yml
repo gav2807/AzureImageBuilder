@@ -1,12 +1,12 @@
 trigger: none
 
-schedules:
-  - cron: "0 8 14 * *"
-    displayName: Monthly build
-    branches:
-     include:
-     - main
-    always: true
+# schedules:
+#   - cron: "0 8 14 * *"
+#     displayName: Monthly build
+#     branches:
+#      include:
+#      - main
+#     always: true
 
 parameters:
 - name: mode
