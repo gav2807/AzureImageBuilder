@@ -9,11 +9,11 @@ param imageDefinitionName string
 param image imageType
 param osName string
 param version string
-param resourceGroupName string = 'az-uks-${environment}-${osName}-aib-rg'
+param resourceGroupName string = 'sbs-uks-${environment}-${osName}-cmnsvc-aib-rg'
 
 
 resource identity 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' existing = {
-  name: 'az-uks-${environment}-aib-id'
+  name: 'sbs-uks-${environment}-cmnsvc-aib-id'
 }
 
 resource acg 'Microsoft.Compute/galleries@2022-03-03' existing = {
@@ -21,8 +21,8 @@ resource acg 'Microsoft.Compute/galleries@2022-03-03' existing = {
 }
 
 resource vnet 'Microsoft.Network/virtualNetworks@2022-11-01' existing = {
-  name: 'az-uks-${environment}-aib-lan-vnet'
-  scope: resourceGroup('az-uks-${environment}-aib-network-rg')
+  name: 'sbs-uks-${environment}-cmnsvc-lan-vnet'
+  scope: resourceGroup('sbs-uks-${environment}-cmnsvc-network-rg')
 }
 
 resource subnet 'Microsoft.Network/virtualNetworks/subnets@2022-11-01' existing = {

@@ -9,12 +9,12 @@ param version string
 
 targetScope = 'resourceGroup'
 
-var computeGalleryName = 'azuks${environment}imagegal'
+var computeGalleryName = 'azuks${environment}cmnsvcimagegal'
 
 var suffix = environment == 'np01' ? 'hardened-beta' : 'hardened'  
 
 resource resourceGroup 'Microsoft.Resources/resourceGroups@2022-09-01' existing = {
-  name: 'sbs-uks-${environment}-gallery-rg'
+  name: 'sbs-uks-${environment}-cmnsvc-gallery-rg'
   scope: subscription()
 }
 
