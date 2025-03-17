@@ -1,12 +1,12 @@
 trigger: none
 
-# schedules:
-#   - cron: "0 8 14 * *"
-#     displayName: Monthly build
-#     branches:
-#      include:
-#      - main
-#     always: true
+schedules:
+  - cron: "0 8 14 * *"
+    displayName: Monthly build
+    branches:
+     include:
+     - main
+    always: true
 
 parameters:
 - name: mode
@@ -26,7 +26,7 @@ name: $(Year:yyyy).$(Month).$(Rev:r)
 
 variables:
   - name: imageTemplateName
-    value: sbs-uks-$(environment)-${{ parameters.image }}-it
+    value: az-uks-$(environment)-${{ parameters.image }}-it
   - name: fileToRun
     value: infrastructure.platform.AIB/infra/images/${{ parameters.image }}.bicep #images/${{ parameters.image }}.bicep
   - name: version
@@ -135,7 +135,7 @@ stages:
               scriptType: "ps"
               scriptLocation: "inlineScript"
               inlineScript: |
-                az deployment group create --name Image_$(Build.BuildId) --resource-group 'sbs-uks-${{ variables.environment }}-cmnsvc-gallery-rg' --template-file $(fileToRun) --parameters infrastructure.platform.AIB/infra/images/placeholder.json version=$(version) environment=$(environment) name=${{ parameters.image }}
+                az deployment group create --name Image_$(Build.BuildId) --resource-group 'az-uks-${{ variables.environment }}-gallery-rg' --template-file $(fileToRun) --parameters infrastructure.platform.AIB/infra/images/placeholder.json version=$(version) environment=$(environment) name=${{ parameters.image }}
 
   - stage: BuildImage
     displayName: 'Build Image'
@@ -151,9 +151,9 @@ stages:
               scriptType: "ps"
               scriptLocation: "inlineScript"
               inlineScript: |
-                az image builder run --name ${{ variables.imageTemplateName }} --resource-group 'sbs-uks-${{ variables.environment }}-cmnsvc-gallery-rg' --no-wait
-                az image builder wait --name ${{ variables.imageTemplateName }} --resource-group 'sbs-uks-${{ variables.environment }}-cmnsvc-gallery-rg' --custom "lastRunStatus.runState!='Running'"
-                if (($lastRunStatus = az image builder show -n ${{ variables.imageTemplateName }} --resource-group 'sbs-uks-${{ variables.environment }}-cmnsvc-gallery-rg' --query "lastRunStatus.runState") -eq "Failed") {
+                az image builder run --name ${{ variables.imageTemplateName }} --resource-group 'az-uks-${{ variables.environment }}-gallery-rg' --no-wait
+                az image builder wait --name ${{ variables.imageTemplateName }} --resource-group 'az-uks-${{ variables.environment }}-gallery-rg' --custom "lastRunStatus.runState!='Running'"
+                if (($lastRunStatus = az image builder show -n ${{ variables.imageTemplateName }} --resource-group 'az-uks-${{ variables.environment }}-gallery-rg' --query "lastRunStatus.runState") -eq "Failed") {
                   exit 1
                 }
-                az image builder show --name ${{ variables.imageTemplateName }} --resource-group 'sbs-uks-${{ variables.environment }}-cmnsvc-gallery-rg'
+                az image builder show --name ${{ variables.imageTemplateName }} --resource-group 'az-uks-${{ variables.environment }}-gallery-rg'
