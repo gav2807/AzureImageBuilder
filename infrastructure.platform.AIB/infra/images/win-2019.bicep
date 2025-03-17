@@ -18,11 +18,6 @@ resource resourceGroup 'Microsoft.Resources/resourceGroups@2022-09-01' existing 
   scope: subscription()
 }
 
-// resource imageBuilderRg 'Microsoft.Resources/resourceGroups@2022-09-01' = {
-//   name: 'sbs-uks-${environment}-cmnsvc-aib-${name}-rg'
-//   location: location
-// }
-
 module imageDefinition '../modules/imageDefinition.bicep' = {
   name: '${uniqueString(deployment().name)}-imageDefinition'
   scope: resourceGroup
