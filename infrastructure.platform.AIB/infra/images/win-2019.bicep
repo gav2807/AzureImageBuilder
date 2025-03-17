@@ -9,12 +9,12 @@ param version string
 
 targetScope = 'resourceGroup'
 
-var computeGalleryName = 'azuks${environment}cmnsvcimagegal'
+var computeGalleryName = 'azuks${environment}imagegal'
 
 var suffix = environment == 'np01' ? 'hardened-beta' : 'hardened'  
 
 resource resourceGroup 'Microsoft.Resources/resourceGroups@2022-09-01' existing = {
-  name: 'sbs-uks-${environment}-cmnsvc-gallery-rg'
+  name: 'az-uks-${environment}-gallery-rg'
   scope: subscription()
 }
 
@@ -454,7 +454,7 @@ module imageTemplate '../modules/imageTemplate.bicep' = {
     ]
     environment: environment
     imageDefinitionName: imageDefinition.outputs.properties.name
-    imageTemplateName: 'sbs-uks-${environment}-${name}-it'
+    imageTemplateName: 'az-uks-${environment}-${name}-it'
     image:{
       sku: '2019-Datacenter'
       offer: 'WindowsServer'
