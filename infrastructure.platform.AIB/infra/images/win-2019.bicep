@@ -395,16 +395,6 @@ module imageTemplate '../modules/imageTemplate.bicep' = {
       }
       {
         type: 'PowerShell'
-        name: 'Add Custom Administrator Account'
-        inline: [
-          'New-LocalUser -Name "Garibaldi" -NoPassword -FullName "Michael Garibaldi"'
-          'Add-LocalGroupMember -Group "Administrators" -Member "Garibaldi"'
-        ]
-        runAsSystem: true
-        runElevated: true
-      }
-      {
-        type: 'PowerShell'
         name: 'Download Powershell 7'
         inline: [
           'Invoke-Webrequest -Uri "https://github.com/PowerShell/PowerShell/releases/download/v7.4.2/PowerShell-7.4.2-win-x64.msi" -OutFile "C:\\PowerShell-7.4.2-win-x64.msi"'
