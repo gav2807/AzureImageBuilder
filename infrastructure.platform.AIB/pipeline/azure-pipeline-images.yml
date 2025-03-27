@@ -79,47 +79,20 @@ stages:
                 echo "File to run: $(fileToRun)"
                 az bicep build --file $(fileToRun)
 
-  # - stage: Clean
-  #   displayName: 'Cleanup'
-  #   dependsOn: Build
-  #   pool: $(agentPool)
-  #   jobs:
-  #     - job: Clean
-  #       steps:
-  #         - task: AzureCLI@2
-  #           inputs:
-  #             azureSubscription: $(serviceConnection)
-  #             scriptType: "ps"  # PowerShell is being used
-  #             scriptLocation: "inlineScript"
-  #             inlineScript: |
-  #               try {
-  #                 # Set up the resource group and virtual network variables
-  #                 $subnet = "imagebuilder-sn"
-  #                 $resourceGroupName = "sbs-uks-np01-cmnsvc-network-rg"
-  #                 $vnetName = "sbs-uks-np01-cmnsvc-lan-vnet"
-  #                 $imageTemplateName = "sbs-uks-np01-win-19-it"
-
-  #                 # Get Virtual Network details
-  #                 Write-Host "Retrieving virtual network..."
-  #                 $vnetId = az network vnet show --name $vnetName --resource-group $resourceGroupName --query id -o tsv
-
-  #                 if (-not $vnetId) {
-  #                   Write-Host "Virtual network not found."
-  #                   exit 1
-  #                 }
-
-  #                 # Update virtual network subnet properties
-  #                 Write-Host "Disabling private link service network policies on subnet..."
-  #                 az network vnet subnet update --vnet-name $vnetName --name $subnet --resource-group $resourceGroupName --private-link-service-network-policies Disabled
-
-  #                 # Remove the Image Builder template
-  #                 Write-Host "Removing Image Builder template..."
-  #                 az image builder template delete --name '${{ variables.imageTemplateName }}' --resource-group $resourceGroupName
-  #               }
-  #               catch {
-  #                 Write-Host "An error occurred: $_"
-  #                 exit 1
-  #               }
+  - stage: Clean
+    displayName: 'Cleanup'
+    dependsOn: Build
+    pool: $(agentPool)
+    jobs:
+      - job: Clean
+        steps:
+          - task: AzureCLI@2
+            inputs:
+              azureSubscription: $(serviceConnection)
+              scriptType: "powershell"  # PowerShell is being used
+              scriptLocation: "inlineScript"
+              inlineScript: |
+                az resource delete --resource-group "az-uks-${{ variables.environment }}-gallery-rg" --name ${{ variables.imageTemplateName }} --resource-type "Microsoft.VirtualMachineImages/imageTemplates" --verbose
 
 
   - stage: Deploy
