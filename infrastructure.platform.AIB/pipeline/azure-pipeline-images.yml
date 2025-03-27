@@ -97,7 +97,7 @@ stages:
 
   - stage: Deploy
     displayName: 'Deploy Bicep'
-    #dependsOn: Clean
+    dependsOn: Clean
     pool: $(agentPool)
     jobs:
       - job: DeployBicep
