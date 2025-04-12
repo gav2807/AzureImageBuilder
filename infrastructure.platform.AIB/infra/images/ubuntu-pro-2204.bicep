@@ -9,6 +9,8 @@ param version string
 
 targetScope = 'subscription'
 
+//targetScope = 'resourceGroup'
+
 resource imageBuilderRg 'Microsoft.Resources/resourceGroups@2022-09-01' = {
   name: 'sbs-uks-${environment}-cmnsvc-aib-${name}-rg'
   location: location

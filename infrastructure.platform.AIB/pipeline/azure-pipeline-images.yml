@@ -144,7 +144,7 @@ stages:
                 fi
 
                 # Proceed with Bicep deployment
-                az deployment group create \
+                az deployment subscription create \
                   --name "Image_$(Build.BuildId)" \
                   --resource-group "az-uks-${{ variables.environment }}-gallery-rg" \
                   --template-file $(fileToRun) \
