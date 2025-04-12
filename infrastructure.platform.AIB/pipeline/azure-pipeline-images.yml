@@ -107,6 +107,7 @@ stages:
               scriptType: "ps"
               scriptLocation: "inlineScript"
               inlineScript: |
+                Install-Module -Name Az -RequiredVersion '10.1.0' -Force -AllowClobber
                 $image = "${{ parameters.image }}"
                 Write-Host "Selected image: $image"
 
