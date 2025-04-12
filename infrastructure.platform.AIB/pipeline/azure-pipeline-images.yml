@@ -101,7 +101,7 @@ stages:
     jobs:
       - job: DeployBicep
         steps:
-          - task: AzureCLI@2
+          - task: AzurePowerShell@5 #AzureCLI@2
             inputs:
               azureSubscription: $(serviceConnection)
               scriptType: "ps"
