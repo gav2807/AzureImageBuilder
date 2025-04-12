@@ -7,14 +7,14 @@ param name string = 'ubuntu-pro-2204'
 param location string = 'uksouth'
 param version string
 
-//targetScope = 'subscription'
+targetScope = 'subscription'
 
-targetScope = 'resourceGroup'
+//targetScope = 'resourceGroup'
 
-// resource resourceGroup 'Microsoft.Resources/resourceGroups@2022-09-01' existing = {
-//   name: 'az-uks-${environment}-gallery-rg'
-//   scope: subscription()
-// }
+resource resourceGroup 'Microsoft.Resources/resourceGroups@2022-09-01' existing = {
+  name: 'az-uks-${environment}-gallery-rg'
+  scope: subscription()
+}
 
 var computeGalleryName = 'sbsuks${environment}cmnsvcimagegal'
 var templateName = 'sbs-uks-${environment}-ubuntu-pro-2204-it'
@@ -23,13 +23,14 @@ var templateName = 'sbs-uks-${environment}-ubuntu-pro-2204-it'
 //   name: 'sbs-uks-${environment}-cmnsvc-gallery-rg'
 // }
 
-// resource imageBuilderRg 'Microsoft.Resources/resourceGroups@2022-09-01' = {
-//   name: 'sbs-uks-${environment}-cmnsvc-aib-${name}-rg'
-//   location: location
-// }
+resource imageBuilderRg 'Microsoft.Resources/resourceGroups@2022-09-01' = {
+  name: 'sbs-uks-${environment}-cmnsvc-aib-${name}-rg'
+  location: location
+}
 
 module imageDefinition '../modules/imageDefinition.bicep' = {
   name: '${uniqueString(deployment().name)}-imageDefinition'
+  scope: resourceGroup
   params: {
     computeGalleryName: computeGalleryName
     imageDefinition: {
@@ -45,6 +46,7 @@ module imageDefinition '../modules/imageDefinition.bicep' = {
 
 module imageTemplate '../modules/imageTemplate.bicep' = {
   name: '${uniqueString(deployment().name)}-imageTemplate'
+  scope: resourceGroup
   params: {
     osName: name
     computeGalleryName: computeGalleryName
