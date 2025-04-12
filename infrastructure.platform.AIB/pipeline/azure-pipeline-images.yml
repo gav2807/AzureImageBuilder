@@ -147,7 +147,6 @@ stages:
                 az deployment sub create \
                   --location "uksouth" \
                   --name "Image_$(Build.BuildId)" \
-                  --resource-group "az-uks-${{ variables.environment }}-gallery-rg" \
                   --template-file $(fileToRun) \
                   --parameters "infrastructure.platform.AIB/infra/images/placeholder.json" \
                   version=$(version) \
