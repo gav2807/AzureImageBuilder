@@ -152,10 +152,12 @@ stages:
       - job: BuildImage
         timeoutInMinutes: 120
         steps:
-          - task: AzureCLI@2
+          - task: AzurePowerShell@5 #AzureCLI@2
             inputs:
               azureSubscription: $(serviceConnection)
               scriptType: "ps"
+              azurePowerShellVersion: 'OtherVersion'
+              preferredAzurePowerShellVersion: '11.1.0'
               scriptLocation: "inlineScript"
               inlineScript: |
                 az image builder run --name ${{ variables.imageTemplateName }} --resource-group 'az-uks-${{ variables.environment }}-gallery-rg' --no-wait
