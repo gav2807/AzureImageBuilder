@@ -79,6 +79,7 @@ stages:
                 echo "File to run: $(fileToRun)"
                 az bicep build --file $(fileToRun)
 
+
   - stage: Clean
     displayName: 'Cleanup'
     dependsOn: Build
@@ -89,10 +90,31 @@ stages:
           - task: AzureCLI@2
             inputs:
               azureSubscription: $(serviceConnection)
-              scriptType: "Bash"  # PowerShell is being used
+              scriptType: "bash"  # Ensuring Bash is used
               scriptLocation: "inlineScript"
               inlineScript: |
-                az resource delete --resource-group "az-uks-${{ variables.environment }}-gallery-rg" --name ${{ variables.imageTemplateName }} --resource-type "Microsoft.VirtualMachineImages/imageTemplates" --verbose
+                # Delete the resource in Azure using Azure CLI
+                echo "Deleting resource with image template name: ${{ variables.imageTemplateName }}"
+                az resource delete \
+                  --resource-group "az-uks-${{ variables.environment }}-gallery-rg" \
+                  --name "${{ variables.imageTemplateName }}" \
+                  --resource-type "Microsoft.VirtualMachineImages/imageTemplates" \
+                  --verbose
+
+  # - stage: Clean
+  #   displayName: 'Cleanup'
+  #   dependsOn: Build
+  #   pool: $(agentPool)
+  #   jobs:
+  #     - job: Clean
+  #       steps:
+  #         - task: AzureCLI@2
+  #           inputs:
+  #             azureSubscription: $(serviceConnection)
+  #             scriptType: "Bash"  # PowerShell is being used
+  #             scriptLocation: "inlineScript"
+  #             inlineScript: |
+  #               az resource delete --resource-group "az-uks-${{ variables.environment }}-gallery-rg" --name ${{ variables.imageTemplateName }} --resource-type "Microsoft.VirtualMachineImages/imageTemplates" --verbose
 
   - stage: Deploy
     displayName: 'Deploy Bicep'
