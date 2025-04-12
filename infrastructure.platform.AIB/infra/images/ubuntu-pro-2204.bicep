@@ -185,9 +185,9 @@ module imageTemplate '../modules/imageTemplate.bicep' = {
       sku: 'pro-22_04-lts'
       version: '22.04.202504080'
       planInfo: {
-        name: 'pro-22_04-lts'
-        product: '0001-com-ubuntu-pro-jammy'
-        publisher: 'canonical'
+        planName: 'pro-22_04-lts'
+        planProduct: '0001-com-ubuntu-pro-jammy'
+        planPublisher: 'canonical'
       }
     }    
     location: location

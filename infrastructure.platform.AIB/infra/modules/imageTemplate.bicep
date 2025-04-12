@@ -78,11 +78,11 @@ type imageType = {
   offer: string
   sku: string
   version: string
-  // planInfo: planInfoType?
+  planInfo: planInfoType?
 }
 
-// type planInfoType = {
-//   planName: string
-//   planProduct: string
-//   planPublisher: string
-// }
+type planInfoType = {
+  planName: string
+  planProduct: string
+  planPublisher: string
+}
