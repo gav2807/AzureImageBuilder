@@ -105,6 +105,8 @@ stages:
             inputs:
               azureSubscription: $(serviceConnection)
               scriptType: "ps"
+              azurePowerShellVersion: 'OtherVersion'
+              preferredAzurePowerShellVersion: '11.1.0'
               scriptLocation: "inlineScript"
               inlineScript: |
                 $image = "${{ parameters.image }}"
