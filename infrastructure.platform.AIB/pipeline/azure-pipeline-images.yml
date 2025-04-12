@@ -105,6 +105,8 @@ stages:
             inputs:
               azureSubscription: $(serviceConnection)
               scriptType: "ps"
+              azurePowerShellVersion: 'OtherVersion'
+              preferredAzurePowerShellVersion: '11.1.0'
               scriptLocation: "inlineScript"
               inlineScript: |
                 Install-Module -Name Az -RequiredVersion '10.1.0' -Force -AllowClobber
@@ -155,6 +157,8 @@ stages:
             inputs:
               azureSubscription: $(serviceConnection)
               scriptType: "ps"
+              azurePowerShellVersion: 'OtherVersion'
+              preferredAzurePowerShellVersion: '11.1.0'
               scriptLocation: "inlineScript"
               inlineScript: |
                 az image builder run --name ${{ variables.imageTemplateName }} --resource-group 'az-uks-${{ variables.environment }}-gallery-rg' --no-wait
