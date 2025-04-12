@@ -73,7 +73,7 @@ stages:
           - task: AzureCLI@2
             inputs:
               azureSubscription: $(serviceConnection)
-              scriptType: "ps"
+              scriptType: "bash"
               scriptLocation: "inlineScript"
               inlineScript: |
                 echo "File to run: $(fileToRun)"
@@ -89,7 +89,7 @@ stages:
           - task: AzureCLI@2
             inputs:
               azureSubscription: $(serviceConnection)
-              scriptType: "powershell"  # PowerShell is being used
+              scriptType: "Bash"  # PowerShell is being used
               scriptLocation: "inlineScript"
               inlineScript: |
                 az resource delete --resource-group "az-uks-${{ variables.environment }}-gallery-rg" --name ${{ variables.imageTemplateName }} --resource-type "Microsoft.VirtualMachineImages/imageTemplates" --verbose
