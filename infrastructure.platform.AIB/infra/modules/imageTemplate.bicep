@@ -47,7 +47,7 @@ resource imageTemplate 'Microsoft.VirtualMachineImages/imageTemplates@2022-02-14
       offer: image.offer
       sku: image.sku
       version: image.version
-      // planInfo: empty(image.planInfo) ? null : image.planInfo
+      planInfo: empty(image.planInfo) ? null : image.planInfo
     }
     stagingResourceGroup: '/subscriptions/${subscription().subscriptionId}/resourceGroups/${resourceGroupName}'
     validate: {}
