@@ -40,7 +40,7 @@ module imageDefinition '../modules/imageDefinition.bicep' = {
 
 module imageTemplate '../modules/imageTemplate.bicep' = {
   name: '${uniqueString(deployment().name)}-imageTemplate'
-  scope: imageBuilderRg
+  scope: resourceGroup
   params: {
     osName: name
     computeGalleryName: computeGalleryName
