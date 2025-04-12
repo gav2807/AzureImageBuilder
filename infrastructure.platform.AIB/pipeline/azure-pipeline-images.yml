@@ -105,8 +105,6 @@ stages:
             inputs:
               azureSubscription: $(serviceConnection)
               scriptType: "ps"
-              azurePowerShellVersion: 'OtherVersion'
-              preferredAzurePowerShellVersion: '11.1.0'
               scriptLocation: "inlineScript"
               inlineScript: |
                 $image = "${{ parameters.image }}"
@@ -156,8 +154,6 @@ stages:
             inputs:
               azureSubscription: $(serviceConnection)
               scriptType: "ps"
-              azurePowerShellVersion: 'OtherVersion'
-              preferredAzurePowerShellVersion: '11.1.0'
               scriptLocation: "inlineScript"
               inlineScript: |
                 az image builder run --name ${{ variables.imageTemplateName }} --resource-group 'az-uks-${{ variables.environment }}-gallery-rg' --no-wait
