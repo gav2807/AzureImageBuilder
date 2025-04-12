@@ -104,7 +104,7 @@ stages:
           - task: AzureCLI@2
             inputs:
               azureSubscription: $(serviceConnection)
-              scriptType: "Bash"
+              scriptType: "ps"
               scriptLocation: "inlineScript"
               inlineScript: |
                 $image = "${{ parameters.image }}"
@@ -153,7 +153,7 @@ stages:
           - task: AzureCLI@2
             inputs:
               azureSubscription: $(serviceConnection)
-              scriptType: "Bash"
+              scriptType: "ps"
               scriptLocation: "inlineScript"
               inlineScript: |
                 az image builder run --name ${{ variables.imageTemplateName }} --resource-group 'az-uks-${{ variables.environment }}-gallery-rg' --no-wait
