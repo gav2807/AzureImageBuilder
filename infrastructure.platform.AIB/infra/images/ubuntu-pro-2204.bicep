@@ -7,23 +7,29 @@ param name string = 'ubuntu-pro-2204'
 param location string = 'uksouth'
 param version string
 
-targetScope = 'subscription'
+//targetScope = 'subscription'
+
+targetScope = 'resourceGroup'
+
+// resource resourceGroup 'Microsoft.Resources/resourceGroups@2022-09-01' existing = {
+//   name: 'az-uks-${environment}-gallery-rg'
+//   scope: subscription()
+// }
 
 var computeGalleryName = 'sbsuks${environment}cmnsvcimagegal'
 var templateName = 'sbs-uks-${environment}-ubuntu-pro-2204-it'
 
-resource resouceGroup 'Microsoft.Resources/resourceGroups@2022-09-01' existing = {
-  name: 'sbs-uks-${environment}-cmnsvc-gallery-rg'
-}
+// resource resouceGroup 'Microsoft.Resources/resourceGroups@2022-09-01' existing = {
+//   name: 'sbs-uks-${environment}-cmnsvc-gallery-rg'
+// }
 
-resource imageBuilderRg 'Microsoft.Resources/resourceGroups@2022-09-01' = {
-  name: 'sbs-uks-${environment}-cmnsvc-aib-${name}-rg'
-  location: location
-}
+// resource imageBuilderRg 'Microsoft.Resources/resourceGroups@2022-09-01' = {
+//   name: 'sbs-uks-${environment}-cmnsvc-aib-${name}-rg'
+//   location: location
+// }
 
 module imageDefinition '../modules/imageDefinition.bicep' = {
   name: '${uniqueString(deployment().name)}-imageDefinition'
-  scope: resouceGroup
   params: {
     computeGalleryName: computeGalleryName
     imageDefinition: {
@@ -33,13 +39,12 @@ module imageDefinition '../modules/imageDefinition.bicep' = {
       offer: templateName
       osType: 'Linux'
     }
-    location: resouceGroup.location
+    location: location
   }
 }
 
 module imageTemplate '../modules/imageTemplate.bicep' = {
   name: '${uniqueString(deployment().name)}-imageTemplate'
-  scope: resouceGroup
   params: {
     osName: name
     computeGalleryName: computeGalleryName
@@ -185,7 +190,7 @@ module imageTemplate '../modules/imageTemplate.bicep' = {
         planPublisher: 'canonical'
       }
     }
-    location: resouceGroup.location
+    location: location
     version: version
   }
 }
