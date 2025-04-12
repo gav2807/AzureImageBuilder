@@ -9,7 +9,10 @@ param version string
 
 targetScope = 'subscription'
 
-//targetScope = 'resourceGroup'
+resource imageBuilderRg 'Microsoft.Resources/resourceGroups@2022-09-01' = {
+  name: 'sbs-uks-${environment}-cmnsvc-aib-${name}-rg'
+  location: location
+}
 
 resource resourceGroup 'Microsoft.Resources/resourceGroups@2022-09-01' existing = {
   name: 'az-uks-${environment}-gallery-rg'
@@ -18,15 +21,6 @@ resource resourceGroup 'Microsoft.Resources/resourceGroups@2022-09-01' existing 
 
 var computeGalleryName = 'sbsuks${environment}cmnsvcimagegal'
 var templateName = 'sbs-uks-${environment}-ubuntu-pro-2204-it'
-
-// resource resouceGroup 'Microsoft.Resources/resourceGroups@2022-09-01' existing = {
-//   name: 'sbs-uks-${environment}-cmnsvc-gallery-rg'
-// }
-
-resource imageBuilderRg 'Microsoft.Resources/resourceGroups@2022-09-01' = {
-  name: 'sbs-uks-${environment}-cmnsvc-aib-${name}-rg'
-  location: location
-}
 
 module imageDefinition '../modules/imageDefinition.bicep' = {
   name: '${uniqueString(deployment().name)}-imageDefinition'
@@ -46,7 +40,7 @@ module imageDefinition '../modules/imageDefinition.bicep' = {
 
 module imageTemplate '../modules/imageTemplate.bicep' = {
   name: '${uniqueString(deployment().name)}-imageTemplate'
-  scope: resourceGroup
+  scope: imageBuilderRg
   params: {
     osName: name
     computeGalleryName: computeGalleryName

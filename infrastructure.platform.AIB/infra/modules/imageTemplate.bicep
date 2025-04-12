@@ -11,13 +11,14 @@ param osName string
 param version string
 param resourceGroupName string = 'az-uks-${environment}-${osName}-aib-rg'
 
-
 resource identity 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' existing = {
   name: 'az-uks-${environment}-aib-id'
+  scope: resourceGroup('az-uks-${environment}-gallery-rg')
 }
 
 resource acg 'Microsoft.Compute/galleries@2022-03-03' existing = {
   name: computeGalleryName
+  scope: resourceGroup('az-uks-${environment}-gallery-rg')
 }
 
 resource vnet 'Microsoft.Network/virtualNetworks@2022-11-01' existing = {
