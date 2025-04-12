@@ -36,7 +36,7 @@ variables:
     - name: environment
       value: np01
     - name: agentPool
-      value: linuxagent #dsha
+      value: default
     - name: subscriptionId
       value: de991dcf-6e08-4849-8e37-d1494a815a94
     - name: serviceConnection
