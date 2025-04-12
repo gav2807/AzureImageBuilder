@@ -94,7 +94,6 @@ stages:
               inlineScript: |
                 az resource delete --resource-group "az-uks-${{ variables.environment }}-gallery-rg" --name ${{ variables.imageTemplateName }} --resource-type "Microsoft.VirtualMachineImages/imageTemplates" --verbose
 
-
   - stage: Deploy
     displayName: 'Deploy Bicep'
     dependsOn: Clean
@@ -108,7 +107,43 @@ stages:
               scriptType: "ps"
               scriptLocation: "inlineScript"
               inlineScript: |
-                az deployment group create --name Image_$(Build.BuildId) --resource-group 'az-uks-${{ variables.environment }}-gallery-rg' --template-file $(fileToRun) --parameters infrastructure.platform.AIB/infra/images/placeholder.json version=$(version) environment=$(environment) name=${{ parameters.image }}
+                $image = "${{ parameters.image }}"
+                Write-Host "Selected image: $image"
+
+                if ($image -eq "ubuntu-pro-2204") {
+                  Write-Host "Accepting Ubuntu Pro 22.04 image terms..."
+                  az vm image terms accept `
+                    --publisher canonical `
+                    --offer 0001-com-ubuntu-pro-jammy `
+                    --sku pro-22_04-lts
+                } else {
+                  Write-Host "No image terms acceptance required for image: $image"
+                }
+
+                # Proceed with Bicep deployment
+                az deployment group create `
+                  --name Image_$(Build.BuildId) `
+                  --resource-group "az-uks-${{ variables.environment }}-gallery-rg" `
+                  --template-file $(fileToRun) `
+                  --parameters infrastructure.platform.AIB/infra/images/placeholder.json `
+                  version=$(version) `
+                  environment=$(environment) `
+                  name=${{ parameters.image }}
+
+  # - stage: Deploy
+  #   displayName: 'Deploy Bicep'
+  #   dependsOn: Clean
+  #   pool: $(agentPool)
+  #   jobs:
+  #     - job: DeployBicep
+  #       steps:
+  #         - task: AzureCLI@2
+  #           inputs:
+  #             azureSubscription: $(serviceConnection)
+  #             scriptType: "ps"
+  #             scriptLocation: "inlineScript"
+  #             inlineScript: |
+  #               az deployment group create --name Image_$(Build.BuildId) --resource-group 'az-uks-${{ variables.environment }}-gallery-rg' --template-file $(fileToRun) --parameters infrastructure.platform.AIB/infra/images/placeholder.json version=$(version) environment=$(environment) name=${{ parameters.image }}
 
   - stage: BuildImage
     displayName: 'Build Image'
