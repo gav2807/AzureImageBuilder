@@ -189,7 +189,7 @@ module imageTemplate '../modules/imageTemplate.bicep' = {
         planProduct: '0001-com-ubuntu-pro-jammy'
         planPublisher: 'canonical'
       }
-    }    
+    }   
     location: location
     version: version
   }
