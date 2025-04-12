@@ -180,16 +180,16 @@ module imageTemplate '../modules/imageTemplate.bicep' = {
     imageDefinitionName: imageDefinition.outputs.properties.name
     imageTemplateName: templateName
     image: {
-      sku: 'pro-22_04-lts'
-      offer: '0001-com-ubuntu-pro-jammy'
       publisher: 'canonical'
-      version: 'latest'
+      offer: '0001-com-ubuntu-pro-jammy'
+      sku: 'pro-22_04-lts'
+      version: '22.04.202504080'
       planInfo: {
         name: 'pro-22_04-lts'
         product: '0001-com-ubuntu-pro-jammy'
         publisher: 'canonical'
       }
-    }
+    }    
     location: location
     version: version
   }
