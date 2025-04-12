@@ -145,7 +145,7 @@ stages:
 
                 # Proceed with Bicep deployment
                 az deployment sub create \
-                  --location "uksouth"
+                  --location "uksouth" \
                   --name "Image_$(Build.BuildId)" \
                   --resource-group "az-uks-${{ variables.environment }}-gallery-rg" \
                   --template-file $(fileToRun) \
