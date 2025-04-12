@@ -101,34 +101,71 @@ stages:
     jobs:
       - job: DeployBicep
         steps:
-          - task: AzurePowerShell@2 #AzureCLI@2
+          - task: AzureCLI@2
             inputs:
               azureSubscription: $(serviceConnection)
-              scriptType: "ps"
-              azurePowerShellVersion: 'OtherVersion'
-              preferredAzurePowerShellVersion: '11.1.0'
+              scriptType: "bash"
               scriptLocation: "inlineScript"
               inlineScript: |
-                Install-Module -Name Az -RequiredVersion '10.1.0' -Force -AllowClobber
-                $image = "${{ parameters.image }}"
-                Write-Host "Selected image: $image"
+                # Install Az module (if needed)
+                az --version || echo "Az CLI is already installed"
 
-                if ($image -eq "ubuntu-pro-2204") {
-                  Write-Host "Accepting Ubuntu Pro 22.04 image terms..."
+                # Define selected image
+                image="${{ parameters.image }}"
+                echo "Selected image: $image"
+
+                if [ "$image" == "ubuntu-pro-2204" ]; then
+                  echo "Accepting Ubuntu Pro 22.04 image terms..."
                   az vm image terms accept --urn canonical:0001-com-ubuntu-pro-jammy:pro-22_04-lts:22.04.202504080
-                } else {
-                  Write-Host "No image terms acceptance required for image: $image"
-                }
+                else
+                  echo "No image terms acceptance required for image: $image"
+                fi
 
                 # Proceed with Bicep deployment
-                az deployment group create `
-                  --name Image_$(Build.BuildId) `
-                  --resource-group "az-uks-${{ variables.environment }}-gallery-rg" `
-                  --template-file $(fileToRun) `
-                  --parameters infrastructure.platform.AIB/infra/images/placeholder.json `
-                  version=$(version) `
-                  environment=$(environment) `
-                  name=${{ parameters.image }}
+                az deployment group create \
+                  --name "Image_$(Build.BuildId)" \
+                  --resource-group "az-uks-${{ variables.environment }}-gallery-rg" \
+                  --template-file $(fileToRun) \
+                  --parameters "infrastructure.platform.AIB/infra/images/placeholder.json" \
+                  version=$(version) \
+                  environment=$(environment) \
+                  name="${{ parameters.image }}"
+
+  # - stage: Deploy
+  #   displayName: 'Deploy Bicep'
+  #   dependsOn: Clean
+  #   pool: $(agentPool)
+  #   jobs:
+  #     - job: DeployBicep
+  #       steps:
+  #         - task: AzurePowerShell@5 #AzureCLI@2
+  #           inputs:
+  #             azureSubscription: $(serviceConnection)
+  #             scriptType: "ps"
+  #             azurePowerShellVersion: 'OtherVersion'
+  #             preferredAzurePowerShellVersion: '11.1.0'
+  #             scriptLocation: "inlineScript"
+  #             inlineScript: |
+  #               Install-Module -Name Az -RequiredVersion '10.1.0' -Force -AllowClobber
+  #               $image = "${{ parameters.image }}"
+  #               Write-Host "Selected image: $image"
+
+  #               if ($image -eq "ubuntu-pro-2204") {
+  #                 Write-Host "Accepting Ubuntu Pro 22.04 image terms..."
+  #                 az vm image terms accept --urn canonical:0001-com-ubuntu-pro-jammy:pro-22_04-lts:22.04.202504080
+  #               } else {
+  #                 Write-Host "No image terms acceptance required for image: $image"
+  #               }
+
+  #               # Proceed with Bicep deployment
+  #               az deployment group create `
+  #                 --name Image_$(Build.BuildId) `
+  #                 --resource-group "az-uks-${{ variables.environment }}-gallery-rg" `
+  #                 --template-file $(fileToRun) `
+  #                 --parameters infrastructure.platform.AIB/infra/images/placeholder.json `
+  #                 version=$(version) `
+  #                 environment=$(environment) `
+  #                 name=${{ parameters.image }}
 
   # - stage: Deploy
   #   displayName: 'Deploy Bicep'
@@ -153,7 +190,7 @@ stages:
       - job: BuildImage
         timeoutInMinutes: 120
         steps:
-          - task: AzurePowerShell@2 #AzureCLI@2
+          - task: AzurePowerShell@5 #AzureCLI@2
             inputs:
               azureSubscription: $(serviceConnection)
               scriptType: "ps"
