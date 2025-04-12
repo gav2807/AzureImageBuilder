@@ -9,7 +9,7 @@ param imageDefinitionName string
 param image imageType
 param osName string
 param version string
-param resourceGroupName string = 'az-uks-${environment}-${osName}-aib-rg'
+param resourceGroupName string = 'az-uks-${environment}-${osName}-aib-imgtmp-rg'
 
 resource identity 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' existing = {
   name: 'az-uks-${environment}-aib-id'
