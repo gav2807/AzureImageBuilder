@@ -112,10 +112,7 @@ stages:
 
                 if ($image -eq "ubuntu-pro-2204") {
                   Write-Host "Accepting Ubuntu Pro 22.04 image terms..."
-                  az vm image terms accept `
-                    --publisher canonical `
-                    --offer 0001-com-ubuntu-pro-jammy `
-                    --sku pro-22_04-lts
+                  az vm image terms accept --urn canonical:0001-com-ubuntu-pro-jammy:pro-22_04-lts:22.04.202504080
                 } else {
                   Write-Host "No image terms acceptance required for image: $image"
                 }
