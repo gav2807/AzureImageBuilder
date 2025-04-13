@@ -167,6 +167,7 @@ stages:
               scriptType: "bash"
               scriptLocation: "inlineScript"
               inlineScript: |
+                az vm image terms accept --urn canonical:0001-com-ubuntu-pro-jammy:pro-22_04-lts:22.04.202504080
                 imageTemplateName="${{ variables.imageTemplateName }}"
                 resourceGroup="az-uks-${{ variables.environment }}-gallery-rg"
 
