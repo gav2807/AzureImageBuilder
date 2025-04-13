@@ -180,11 +180,11 @@ module imageTemplate '../modules/imageTemplate.bicep' = {
       offer: '0001-com-ubuntu-server-jammy'
       sku: '22_04-lts-gen2'
       version: 'latest'
-      planInfo: {
-        planName: '22_04-lts-gen2'
-        planProduct: '0001-com-ubuntu-server-jammy'
-        planPublisher: 'canonical'
-      }
+      // planInfo: {
+      //   planName: '22_04-lts-gen2'
+      //   planProduct: '0001-com-ubuntu-server-jammy'
+      //   planPublisher: 'canonical'
+      // }
     }   
     location: location
     version: version
