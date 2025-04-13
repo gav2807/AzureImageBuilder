@@ -20,7 +20,7 @@ resource resourceGroup 'Microsoft.Resources/resourceGroups@2022-09-01' existing 
 }
 
 var computeGalleryName = 'sbsuks${environment}cmnsvcimagegal'
-var templateName = 'sbs-uks-${environment}-ubuntu-pro-2204-it'
+var templateName = 'az-uks-${environment}-ubuntu-pro-2204-it'
 
 module imageDefinition '../modules/imageDefinition.bicep' = {
   name: '${uniqueString(deployment().name)}-imageDefinition'
