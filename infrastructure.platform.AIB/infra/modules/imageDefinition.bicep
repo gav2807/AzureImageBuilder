@@ -19,6 +19,7 @@ resource image 'Microsoft.Compute/galleries/images@2022-03-03' = {
     }
     osState: 'Generalized'
     osType: imageDefinition.?osType ?? 'Windows'
+    hyperVGeneration: 'V2' 
   }
   tags: resourceGroup().tags
 }
