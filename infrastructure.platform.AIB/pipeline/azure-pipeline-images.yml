@@ -153,6 +153,40 @@ stages:
                   environment=$(environment) \
                   name="${{ parameters.image }}"
 
+  - stage: BuildImage
+    displayName: 'Build Image'
+    dependsOn: Deploy
+    pool: $(agentPool)
+    jobs:
+      - job: BuildImage
+        timeoutInMinutes: 120
+        steps:
+          - task: AzureCLI@2
+            inputs:
+              azureSubscription: $(serviceConnection)
+              scriptType: "bash"
+              scriptLocation: "inlineScript"
+              inlineScript: |
+                imageTemplateName="${{ variables.imageTemplateName }}"
+                resourceGroup="az-uks-${{ variables.environment }}-gallery-rg"
+
+                echo "Starting image builder run for: $imageTemplateName"
+                az image builder run --name "$imageTemplateName" --resource-group "$resourceGroup" --no-wait
+
+                echo "Waiting for image build to complete..."
+                az image builder wait --name "$imageTemplateName" --resource-group "$resourceGroup" --custom "lastRunStatus.runState!='Running'"
+
+                runStatus=$(az image builder show -n "$imageTemplateName" --resource-group "$resourceGroup" --query "lastRunStatus.runState" -o tsv)
+                echo "Image build status: $runStatus"
+
+                if [ "$runStatus" == "Failed" ]; then
+                  echo "Image build failed"
+                  exit 1
+                fi
+
+                echo "Image build completed successfully. Final status:"
+                az image builder show --name "$imageTemplateName" --resource-group "$resourceGroup"
+
   # - stage: Deploy
   #   displayName: 'Deploy Bicep'
   #   dependsOn: Clean
@@ -204,25 +238,25 @@ stages:
   #             inlineScript: |
   #               az deployment group create --name Image_$(Build.BuildId) --resource-group 'az-uks-${{ variables.environment }}-gallery-rg' --template-file $(fileToRun) --parameters infrastructure.platform.AIB/infra/images/placeholder.json version=$(version) environment=$(environment) name=${{ parameters.image }}
 
-  - stage: BuildImage
-    displayName: 'Build Image'
-    dependsOn: Deploy
-    pool: $(agentPool)
-    jobs:
-      - job: BuildImage
-        timeoutInMinutes: 120
-        steps:
-          - task: AzurePowerShell@5 #AzureCLI@2
-            inputs:
-              azureSubscription: $(serviceConnection)
-              scriptType: "ps"
-              azurePowerShellVersion: 'OtherVersion'
-              preferredAzurePowerShellVersion: '11.1.0'
-              scriptLocation: "inlineScript"
-              inlineScript: |
-                az image builder run --name ${{ variables.imageTemplateName }} --resource-group 'az-uks-${{ variables.environment }}-gallery-rg' --no-wait
-                az image builder wait --name ${{ variables.imageTemplateName }} --resource-group 'az-uks-${{ variables.environment }}-gallery-rg' --custom "lastRunStatus.runState!='Running'"
-                if (($lastRunStatus = az image builder show -n ${{ variables.imageTemplateName }} --resource-group 'az-uks-${{ variables.environment }}-gallery-rg' --query "lastRunStatus.runState") -eq "Failed") {
-                  exit 1
-                }
-                az image builder show --name ${{ variables.imageTemplateName }} --resource-group 'az-uks-${{ variables.environment }}-gallery-rg'
+  # - stage: BuildImage
+  #   displayName: 'Build Image'
+  #   dependsOn: Deploy
+  #   pool: $(agentPool)
+  #   jobs:
+  #     - job: BuildImage
+  #       timeoutInMinutes: 120
+  #       steps:
+  #         - task: AzurePowerShell@5 #AzureCLI@2
+  #           inputs:
+  #             azureSubscription: $(serviceConnection)
+  #             scriptType: "ps"
+  #             azurePowerShellVersion: 'OtherVersion'
+  #             preferredAzurePowerShellVersion: '11.1.0'
+  #             scriptLocation: "inlineScript"
+  #             inlineScript: |
+  #               az image builder run --name ${{ variables.imageTemplateName }} --resource-group 'az-uks-${{ variables.environment }}-gallery-rg' --no-wait
+  #               az image builder wait --name ${{ variables.imageTemplateName }} --resource-group 'az-uks-${{ variables.environment }}-gallery-rg' --custom "lastRunStatus.runState!='Running'"
+  #               if (($lastRunStatus = az image builder show -n ${{ variables.imageTemplateName }} --resource-group 'az-uks-${{ variables.environment }}-gallery-rg' --query "lastRunStatus.runState") -eq "Failed") {
+  #                 exit 1
+  #               }
+  #               az image builder show --name ${{ variables.imageTemplateName }} --resource-group 'az-uks-${{ variables.environment }}-gallery-rg'
