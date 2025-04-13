@@ -177,12 +177,12 @@ module imageTemplate '../modules/imageTemplate.bicep' = {
     imageTemplateName: templateName
     image: {
       publisher: 'canonical'
-      offer: '0001-com-ubuntu-pro-jammy'
-      sku: 'pro-22_04-lts'
-      version: '22.04.202504080'
+      offer: '0001-com-ubuntu-server-jammy'
+      sku: '22_04-lts-gen2'
+      version: 'latest'
       planInfo: {
-        planName: 'pro-22_04-lts'
-        planProduct: '0001-com-ubuntu-pro-jammy'
+        planName: '22_04-lts-gen2'
+        planProduct: '0001-com-ubuntu-server-jammy'
         planPublisher: 'canonical'
       }
     }   

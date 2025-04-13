@@ -136,13 +136,6 @@ stages:
                 image="${{ parameters.image }}"
                 echo "Selected image: $image"
 
-                if [ "$image" == "ubuntu-pro-2204" ]; then
-                  echo "Accepting Ubuntu Pro 22.04 image terms..."
-                  az vm image terms accept --urn canonical:0001-com-ubuntu-pro-jammy:pro-22_04-lts:22.04.202504080
-                else
-                  echo "No image terms acceptance required for image: $image"
-                fi
-
                 # Proceed with Bicep deployment
                 az deployment sub create \
                   --location "uksouth" \
@@ -167,7 +160,7 @@ stages:
               scriptType: "bash"
               scriptLocation: "inlineScript"
               inlineScript: |
-                az vm image terms accept --urn canonical:0001-com-ubuntu-pro-jammy:pro-22_04-lts:22.04.202504080
+                az vm image terms accept --urn Canonical:0001-com-ubuntu-server-jammy:22_04-lts-gen2:latest 
                 imageTemplateName="${{ variables.imageTemplateName }}"
                 resourceGroup="az-uks-${{ variables.environment }}-gallery-rg"
 
